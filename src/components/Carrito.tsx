@@ -1,15 +1,14 @@
-import type { interfaceGuitar } from "../data/db";
+import type { Dispatch } from "react"
+import type { CartAction, CartItem } from "../reducers/cart-reduces"
 
-function Carrito({ carrito ,deletedGuitar,vaciarCarrito,
-    aumentarCantidad,disminuirCantidad,total,isEmpty}:
-    {carrito:interfaceGuitar[],
-    deletedGuitar:(id:number) => void,
-vaciarCarrito:() => void,
-aumentarCantidad:(id:number) => void,
-disminuirCantidad:(id:number) => void,
-total:number,
-isEmpty:boolean}) {
-   
+function Carrito({ carrito, dispatch, total, isEmpty }:
+    {
+        carrito: CartItem[],
+        dispatch: Dispatch<CartAction>,
+        total: number,
+        isEmpty: boolean
+    }) {
+
 
 
     return (
@@ -49,7 +48,7 @@ isEmpty:boolean}) {
                                                 <button
                                                     type="button"
                                                     className="btn btn-dark"
-                                                    onClick={() => disminuirCantidad(car.id)}
+                                                    onClick={() => dispatch({ type: "rest-to-cart", payload: { id: car.id } })}
                                                 >
                                                     -
                                                 </button>
@@ -57,7 +56,7 @@ isEmpty:boolean}) {
                                                 <button
                                                     type="button"
                                                     className="btn btn-dark"
-                                                    onClick={() => aumentarCantidad(car.id)}
+                                                    onClick={() => dispatch({ type: "plus-to-cart", payload: { id: car.id } })}
                                                 >
                                                     +
                                                 </button>
@@ -66,7 +65,7 @@ isEmpty:boolean}) {
                                                 <button
                                                     className="btn btn-danger"
                                                     type="button"
-                                                    onClick={() =>deletedGuitar(car.id)}
+                                                    onClick={() => dispatch({ type: "delete-to-cart", payload: { id: car.id } })}
                                                 >
                                                     X
                                                 </button>
@@ -79,10 +78,16 @@ isEmpty:boolean}) {
 
                 }
                 <p className="text-end">Total pagar: <span className="fw-bold">$ {total}</span></p>
-                <button type="button" className="btn btn-dark w-100 mt-3 p-2" onClick={() => vaciarCarrito()}>Vaciar Carrito</button>
+                <button
+                    type="button"
+                    className="btn btn-dark w-100 mt-3 p-2"
+                    onClick={() => dispatch({ type: "clear-to-cart" })}
+                >
+                    Vaciar Carrito
+                </button>
             </div>
         </div>
     )
 }
 
-export default Carrito;
+export default Carrito

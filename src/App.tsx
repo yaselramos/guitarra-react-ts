@@ -5,26 +5,19 @@ import Guitar from "./components/Guitar"
 import useCarrito from "./hooks/useCarrito"
 
 function App() {
-  const {
-    guitars, 
-    carrito, 
-    addCarrito, 
-    deletedGuitar,
-     vaciarCarrito, 
-     aumentarCantidad, 
-     disminuirCantidad ,
-     total,
-     isEmpty
+    const {
+        guitars,
+        carrito,
+        total,
+        isEmpty,
+        dispatch,
     } = useCarrito()
 
     return (
         <>
-            <Header 
-            carrito={carrito} 
-             deletedGuitar={deletedGuitar}
-             vaciarCarrito={vaciarCarrito}
-             aumentarCantidad={aumentarCantidad}
-             disminuirCantidad={disminuirCantidad}
+            <Header
+                carrito={carrito}
+                dispatch={dispatch}
                 total={total}
                 isEmpty={isEmpty}
             />
@@ -38,8 +31,8 @@ function App() {
                         guitars.map(guitar => (
                             <Guitar key={guitar.id}
                                 guitar={guitar}
-                                addCarrito={addCarrito}
-                               
+                                dispatch={dispatch}
+
                             />
                         ))
                     }

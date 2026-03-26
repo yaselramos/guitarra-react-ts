@@ -1,14 +1,11 @@
-import type { interfaceGuitar } from "../data/db"
+import type { Dispatch } from "react"
+import type { CartItem } from "../reducers/cart-reduces"
+import type { CartAction } from "../reducers/cart-reduces"
 import Carrito from "./Carrito"
 
-function Header({ carrito, deletedGuitar,
-    vaciarCarrito, aumentarCantidad, disminuirCantidad
-    , total, isEmpty }: {
-        carrito: interfaceGuitar[],
-        deletedGuitar: (id: number) => void,
-        vaciarCarrito: () => void,
-        aumentarCantidad: (id: number) => void,
-        disminuirCantidad: (id: number) => void,
+function Header({ carrito, dispatch, total, isEmpty }: {
+        carrito: CartItem[],
+        dispatch: Dispatch<CartAction>,
         total: number,
         isEmpty: boolean
     }) {
@@ -24,10 +21,7 @@ function Header({ carrito, deletedGuitar,
                     <nav className="col-md-6 a mt-5 d-flex align-items-start justify-content-end">
                         <Carrito
                             carrito={carrito}
-                            deletedGuitar={deletedGuitar}
-                            vaciarCarrito={vaciarCarrito}
-                            aumentarCantidad={aumentarCantidad}
-                            disminuirCantidad={disminuirCantidad}
+                            dispatch={dispatch}
                             total={total}
                             isEmpty={isEmpty}
                         />

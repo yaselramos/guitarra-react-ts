@@ -1,82 +1,58 @@
-import { useEffect, useMemo, useState } from "react"
-import { arraydb, type interfaceGuitar } from "../data/db"
+import { useEffect, useMemo, useReducer } from "react"
+import {
+  cartReducer,
+  initialState,
+  type CartItem,
+  type CartState,
+} from "../reducers/cart-reduces"
 
-type CartItem = interfaceGuitar & { cantidad: number }
+const STORAGE_KEY = "carrito"
 
 const useCarrito = () => {
-  const [guitars] = useState<interfaceGuitar[]>(arraydb)
+  const inicialCarrito = (): CartState => {
+    if (typeof window === "undefined") {
+      return initialState
+    }
 
-  const inicialCarrito = (): CartItem[] => {
-    const localCarrito = localStorage.getItem("carrito")
-    return localCarrito ? (JSON.parse(localCarrito) as CartItem[]) : []
+    try {
+      const localCarrito = window.localStorage.getItem(STORAGE_KEY)
+      if (!localCarrito) {
+        return initialState
+      }
+
+      const parsedCarrito = JSON.parse(localCarrito)
+      if (!Array.isArray(parsedCarrito)) {
+        return initialState
+      }
+
+      return {
+        ...initialState,
+        cart: parsedCarrito as CartItem[],
+      }
+    } catch {
+      return initialState
+    }
   }
 
-  const [carrito, setCarrito] = useState<CartItem[]>(inicialCarrito)
+  const [state, dispatch] = useReducer(cartReducer, initialState, inicialCarrito)
 
   useEffect(() => {
-    localStorage.setItem("carrito", JSON.stringify(carrito))
-  }, [carrito])
-
-  function addCarrito(item: interfaceGuitar) {
-    const itemExist = carrito.findLastIndex((guitar: CartItem) => guitar.id === item.id)
-
-    if (itemExist === -1) {
-      setCarrito([...carrito, { ...item, cantidad: 1 }])
-    } else {
-      const updatedCarrito = [...carrito]
-      updatedCarrito[itemExist].cantidad += 1
-      setCarrito(updatedCarrito)
-    }
-  }
-
-  function deletedGuitar(id: number) {
-    const pos = carrito.findIndex((car: CartItem) => car.id === id)
-    if (pos !== -1) {
-      const updatedCarrito = [...carrito]
-      updatedCarrito.splice(pos, 1)
-      setCarrito(updatedCarrito)
-    }
-  }
-
-  function vaciarCarrito() {
-    setCarrito([])
-  }
-
-  function aumentarCantidad(id: number) {
-    const pos = carrito.findIndex((car: CartItem) => car.id === id)
-    if (pos !== -1) {
-      const updatedCarrito = [...carrito]
-      updatedCarrito[pos].cantidad += 1
-      setCarrito(updatedCarrito)
-    }
-  }
-
-  function disminuirCantidad(id: number) {
-    const pos = carrito.findIndex((car: CartItem) => car.id === id)
-    if (pos !== -1 && carrito[pos].cantidad > 1) {
-      const updatedCarrito = [...carrito]
-      updatedCarrito[pos].cantidad -= 1
-      setCarrito(updatedCarrito)
-    }
-  }
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state.cart))
+  }, [state.cart])
 
   const total = useMemo(
-    () => carrito.reduce((total: number, item: CartItem) => total + item.price * item.cantidad, 0),
-    [carrito],
+    () => state.cart.reduce((total: number, item: CartItem) => total + item.price * item.cantidad, 0),
+    [state.cart],
   )
 
-  const isEmpty = useMemo(() => carrito.length === 0, [carrito])
+  const isEmpty = useMemo(() => state.cart.length === 0, [state.cart])
 
   return {
-    guitars,
-    carrito,
-    addCarrito,
-    deletedGuitar,
-    vaciarCarrito,
-    aumentarCantidad,
-    disminuirCantidad,
+    guitars: state.data,
+    carrito: state.cart,
     total,
     isEmpty,
+    dispatch,
   }
 }
 
